@@ -1,24 +1,22 @@
-declare namespace NodeJS {
-  interface ProcessEnv {
-    JWT_SECRET: string;
-    NODE_ENV?: "development" | "production" | "test";
-    PORT?: string;
-  }
+// types/express.d.ts
+
+export interface UserJWT {
+  id: number;
+  role: "admin" | "user" | "provider";
 }
 
-import { JwtPayload } from "jsonwebtoken";
+export interface UserGoogle {
+  id: string;
+  email: string;
+  name: string;
+  refreshToken?: string | null;
+  profile?: any; // أو تعمل interface مظبوط للـ profile
+}
 
 declare global {
   namespace Express {
-
-
-
-
     interface Request {
-      user?: {
-        id: number;
-        role: "admin" | "user" | "provider";
-      }
+      user?: UserJWT | UserGoogle;
     }
   }
 }

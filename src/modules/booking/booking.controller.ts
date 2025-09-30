@@ -6,13 +6,14 @@ import Availability from "../../../db/models/availability.model";
 import { google } from "googleapis";
 import User from "../../../db/models/user.model";
 import dotenv from "dotenv";
+import { UserJWT } from "../../../types";
 
 dotenv.config();
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  "postmessage"
 );
 
 export const createBooking = createError(
@@ -61,7 +62,7 @@ export const createBooking = createError(
 
 export const getBookings = createError(async (req: Request, res: Response) => {
   const userId = req.user?.id;
-  const role = req.user?.role;
+  const role = (req.user as UserJWT).role;
 
   let bookings;
 
@@ -81,7 +82,7 @@ export const updateBooking = createError(
   async (req: Request, res: Response) => {
     const { bookingId } = req.params;
     const { startTime, endTime } = req.body;
-    const role = req.user?.role;
+    const role = (req.user as UserJWT).role;
     const userId = req.user?.id;
 
     const booking = await Booking.findByPk(bookingId);
@@ -123,7 +124,7 @@ export const updateBooking = createError(
 export const cancelBooking = createError(
   async (req: Request, res: Response) => {
     const { bookingId } = req.params;
-    const role = req.user?.role;
+    const role = (req.user as UserJWT).role;
     const userId = req.user?.id;
 
     const booking = await Booking.findByPk(bookingId);

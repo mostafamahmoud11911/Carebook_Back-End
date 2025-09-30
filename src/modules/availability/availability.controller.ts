@@ -5,14 +5,14 @@ import { NextFunction, Request, Response } from "express";
 import { createError } from "../../../middleware/createError";
 import ApiError from "../../../utils/ApiError";
 import dotenv from "dotenv";
+import { UserJWT } from "../../../types";
 
 dotenv.config();
 
-// لازم يكون عندنا refresh token مخزّن لما البروفايدر يعمل OAuth
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  "postmessage"
 );
 
 export const getAvailability = createError(
@@ -36,7 +36,7 @@ export const getAvailability = createError(
 export const addAvailability = createError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { serviceId, startTime, endTime } = req.body;
-    const providerId = req.user?.id as number;
+    const providerId = req.user?.id as UserJWT["id"];
 
     const provider = await User.findByPk(providerId);
     if (!provider) return next(new ApiError("Provider not found", 404));

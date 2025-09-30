@@ -22,10 +22,10 @@ interface UserAttributes {
   rolePending?: "provider" | null;
   isApproved?: boolean;
   wishlist?: any[];
-  googleRefreshToken?: string;
+  googleRefreshToken?: string | null;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, "id" | "password" | "rolePending" | "isApproved" | "googleId" | "googleRefreshToken"> {}
+interface UserCreationAttributes extends Optional<UserAttributes, "id" | "password" | "rolePending" | "isApproved" | "googleId" | "googleRefreshToken" | "wishlist"> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: number;
@@ -37,7 +37,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public googleId?: string;
   public rolePending?: "provider" | null;
   public isApproved?: boolean;
-  public googleRefreshToken?: string;
+  public googleRefreshToken?: string | null;
   public wishlist!: any[];
 
   public generateAuthToken(): string {

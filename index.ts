@@ -7,6 +7,9 @@ import sequelize from "./db/db";
 import bootstrap from "./src/modules/bootstrap";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
+import passport from "passport";
+import "./utils/passportSetUp";
+import { googleSignIn } from "./src/modules/auth/authController";
 
 dotenv.config();
 interface customError extends Error {
@@ -21,7 +24,28 @@ app.use(helmet());
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser(process.env.JWT_SECRET as string));
+app.use(cookieParser());
+app.use(passport.initialize());
+
+app.get("/google", (req, res, next) => {
+  const state = req.query.state || "user"; // user أو provider
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    accessType: "offline",
+    prompt: "consent",
+    state,
+  } as any)(req, res, next);
+});
+
+app.get("/fail", (req, res) => {
+  return res.json({ message: "Fail to login" });
+});
+
+app.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false, failureRedirect: "/fail" }),
+  googleSignIn
+);
 
 bootstrap(app);
 
@@ -39,7 +63,7 @@ app.use((err: customError, req: Request, res: Response, next: NextFunction) => {
 async function startServer() {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ alter: false });
+    await sequelize.sync({ force: false });
     app.listen(port, () =>
       console.log(`Example app listening on port ${port}!`)
     );
