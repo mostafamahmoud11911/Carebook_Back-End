@@ -3,6 +3,7 @@ import sequelize from "../db";
 import User from "./user.model";
 import Availability from "./availability.model";
 import Booking from "./booking.model";
+import Review from "./review.model";
 
 interface ServiceAttributes {
   id: number;
@@ -113,5 +114,12 @@ Availability.belongsTo(Service, { foreignKey: "serviceId" });
 // Service - Booking
 Service.hasMany(Booking, { foreignKey: "serviceId", as: "bookings" });
 Booking.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
+
+
+
+// review
+Service.hasMany(Review, { foreignKey: "serviceId" });
+Review.belongsTo(Service, { foreignKey: "serviceId" });
+
 
 export default Service;

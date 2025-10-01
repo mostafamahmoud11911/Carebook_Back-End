@@ -10,7 +10,7 @@ export interface UserGoogle {
   email: string;
   name: string;
   refreshToken?: string | null;
-  profile?: any; // أو تعمل interface مظبوط للـ profile
+  profile?: any;
 }
 
 declare global {

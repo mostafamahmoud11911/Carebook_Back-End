@@ -5,11 +5,10 @@ import jwt from "jsonwebtoken";
 import Booking from "./booking.model";
 import Service from "./service.model";
 import Availability from "./availability.model";
+import Review from "./review.model";
 
 type Role = "admin" | "user" | "provider";
 type AuthProvider = "local" | "google";
-
-
 
 interface UserAttributes {
   id?: number;
@@ -25,9 +24,22 @@ interface UserAttributes {
   googleRefreshToken?: string | null;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, "id" | "password" | "rolePending" | "isApproved" | "googleId" | "googleRefreshToken" | "wishlist"> {}
+interface UserCreationAttributes
+  extends Optional<
+    UserAttributes,
+    | "id"
+    | "password"
+    | "rolePending"
+    | "isApproved"
+    | "googleId"
+    | "googleRefreshToken"
+    | "wishlist"
+  > {}
 
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes
+{
   public id!: number;
   public username!: string;
   public email!: string;
@@ -41,7 +53,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public wishlist!: any[];
 
   public generateAuthToken(): string {
-    return jwt.sign({ id: this.id, role: this.role }, process.env.JWT_SECRET as string);
+    return jwt.sign(
+      { id: this.id, role: this.role },
+      process.env.JWT_SECRET as string
+    );
   }
 
   public async comparePassword(password: string): Promise<boolean> {
@@ -52,7 +67,11 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
 User.init(
   {
-    id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     username: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
     password: { type: DataTypes.STRING, allowNull: true },
@@ -69,7 +88,11 @@ User.init(
     },
     googleId: { type: DataTypes.STRING, allowNull: true, unique: true },
     rolePending: { type: DataTypes.ENUM("provider"), allowNull: true },
-    isApproved: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    isApproved: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     googleRefreshToken: { type: DataTypes.STRING, allowNull: true },
   },
   {
@@ -95,21 +118,20 @@ User.init(
 User.hasMany(Service, { foreignKey: "userId" });
 Service.belongsTo(User, { foreignKey: "userId" });
 
-
 // User (client) - Booking
 User.hasMany(Booking, { foreignKey: "clientId", as: "clientBookings" });
 Booking.belongsTo(User, { foreignKey: "clientId", as: "client" });
-
 
 // User (provider) - Booking
 User.hasMany(Booking, { foreignKey: "providerId", as: "providerBookings" });
 Booking.belongsTo(User, { foreignKey: "providerId", as: "provider" });
 
-
 // User (provider) - Availability
 User.hasMany(Availability, { foreignKey: "providerId", as: "availabilities" });
 Availability.belongsTo(User, { foreignKey: "providerId", as: "provider" });
 
-
+// Review
+User.hasMany(Review, { foreignKey: "userId", as: "reviews" });
+Review.belongsTo(User, { foreignKey: "userId", as: "reviews" });
 
 export default User;

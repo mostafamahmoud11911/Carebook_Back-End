@@ -21,7 +21,13 @@ Booking.init(
     },
     clientId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
     providerId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
-    serviceId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
+    serviceId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      references: { model: "Services", key: "id" },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    },
     availabilityId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
     status: {
       type: DataTypes.ENUM("confirmed", "cancelled"),
