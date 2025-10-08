@@ -59,7 +59,7 @@ Review.init({
 }, {
     sequelize,
     modelName: "Review",
-    tableName: "Reviews",
+    updatedAt: false
 });
 
 

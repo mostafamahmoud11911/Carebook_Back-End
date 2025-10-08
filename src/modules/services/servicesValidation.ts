@@ -7,7 +7,6 @@ const createServiceSchema = Joi.object({
   offers: Joi.string(),
   image: Joi.any().optional(),
   images: Joi.array().items(Joi.any()).optional(),
-  rate: Joi.number().min(0).max(5).required(),
   userId: Joi.number().integer().positive(),
 });
 

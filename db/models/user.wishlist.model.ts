@@ -29,8 +29,7 @@ UserWishlist.init(
   {
     sequelize,
     modelName: "UserWishlist",
-    timestamps: true,
-    tableName: "UserWishlists",
+    updatedAt: false,
   }
 );
 export default UserWishlist;

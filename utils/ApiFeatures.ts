@@ -1,4 +1,4 @@
-import { FindOptions, Op, or } from "sequelize";
+import { FindOptions, Op } from "sequelize";
 
 export default class ApiFeatures {
   sequelizeQuery: FindOptions;
@@ -10,12 +10,14 @@ export default class ApiFeatures {
   }
 
   searchQuery() {
-    if (this.queryParams.search) {
+    let { search } = this.queryParams;
+    if (search) {
       this.sequelizeQuery.where = {
         ...this.sequelizeQuery.where,
         name: { [Op.like]: `%${this.queryParams.search}%` },
       };
     }
+
     return this;
   }
 

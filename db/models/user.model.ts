@@ -98,6 +98,7 @@ User.init(
   {
     sequelize,
     updatedAt: false,
+    modelName: "User",
     hooks: {
       beforeCreate: async (user) => {
         if (user.authProvider === "local" && user.password) {

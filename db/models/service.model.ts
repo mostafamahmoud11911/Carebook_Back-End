@@ -13,7 +13,7 @@ interface ServiceAttributes {
   offers?: string;
   image?: string;
   images?: string[];
-  rate: number;
+  rate?: number;
   userId: number;
 }
 
@@ -30,7 +30,7 @@ class Service
   public offers?: string;
   public image?: string;
   public images?: string[];
-  public rate!: number;
+  public rate?: number;
   public userId!: number;
 }
 
@@ -82,7 +82,7 @@ Service.init(
     },
     rate: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       validate: {
         max: 5,
         min: 0,
@@ -101,6 +101,7 @@ Service.init(
   },
   {
     sequelize,
+    modelName: "Service",
     updatedAt: false,
   }
 );
@@ -113,7 +114,7 @@ Availability.belongsTo(Service, { foreignKey: "serviceId" });
 
 // Service - Booking
 Service.hasMany(Booking, { foreignKey: "serviceId", as: "bookings" });
-Booking.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
+Booking.belongsTo(Service, { foreignKey: "serviceId", as: "services" });
 
 
 

@@ -63,7 +63,7 @@ app.use((err: customError, req: Request, res: Response, next: NextFunction) => {
 async function startServer() {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ force: false });
+    await sequelize.sync({ alter: false });
     app.listen(port, () =>
       console.log(`Example app listening on port ${port}!`)
     );

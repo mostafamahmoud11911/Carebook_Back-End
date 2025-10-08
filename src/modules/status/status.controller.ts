@@ -21,7 +21,7 @@ export const getAdminDashboard = createError(
     );
 
     const popularServices = await Booking.findAll({
-      attributes: ["serviceId", [fn("COUNT", col("id")), "bookingCount"]],
+      attributes: ["serviceId", [fn("COUNT", col("Booking.id")), "bookingCount"]],
       where: {
         createdAt: {
           [Op.between]: [startOfMonth, endOfMonth],
@@ -32,6 +32,7 @@ export const getAdminDashboard = createError(
       include: [
         {
           model: Service,
+          as:"services",
           attributes: ["id", "name", "price"],
         },
       ],
@@ -41,7 +42,7 @@ export const getAdminDashboard = createError(
     const bookingsTrend = await Booking.findAll({
       attributes: [
         [fn("DATE", col("createdAt")), "date"],
-        [fn("COUNT", col("id")), "count"],
+        [fn("COUNT", col("Booking.id")), "count"],
       ],
       group: [fn("DATE", col("createdAt"))],
       order: [[literal("date"), "ASC"]],
@@ -51,12 +52,11 @@ export const getAdminDashboard = createError(
     const bookingsCount = await Booking.count();
 
     const usersCount = await User.findAll({
-      attributes: ["role", [fn("COUNT", col("id")), "count"]],
+      attributes: ["role", [fn("COUNT", col("User.id")), "count"]],
       group: ["role"],
     });
 
     res.status(200).json({
-      message: "Dashboard fetched successfully",
       services: servicesCount,
       popularServices,
       bookingsTrend,
@@ -89,6 +89,7 @@ export const getProviderDashboard = createError(
       include: [
         {
           model: Service,
+          as: "services",
           attributes: ["id", "name"],
         },
       ],
@@ -100,7 +101,6 @@ export const getProviderDashboard = createError(
 
 
     res.status(200).json({
-      message: "Dashboard fetched successfully",
       services: servicesCount,
       bookings: bookingsService,
     });

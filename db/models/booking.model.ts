@@ -33,10 +33,10 @@ Booking.init(
       type: DataTypes.ENUM("confirmed", "cancelled"),
       defaultValue: "confirmed",
     },
-    startTime: { type: DataTypes.DATE, allowNull: true }, // في حالة تعديل الموعد
+    startTime: { type: DataTypes.DATE, allowNull: true },
     endTime: { type: DataTypes.DATE, allowNull: true },
   },
-  { sequelize, modelName: "Booking" }
+  { sequelize, modelName: "Booking", updatedAt: false }
 );
 
 export default Booking;

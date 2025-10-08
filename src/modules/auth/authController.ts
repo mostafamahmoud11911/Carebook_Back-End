@@ -3,20 +3,20 @@ import { createError } from "../../../middleware/createError";
 import User from "../../../db/models/user.model";
 import ApiError from "../../../utils/ApiError";
 import { OAuth2Client } from "google-auth-library";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { google } from "googleapis";
 
 dotenv.config();
 
 export const register = createError(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = await User.create({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
       authProvider: "local",
       role: "user",
-      ...req.body,
     });
-    res.status(201).json(user);
+    res.status(201).json({ message: "Successfully registered", user });
   }
 );
 
@@ -44,12 +44,12 @@ export const login = createError(
           username: user.username,
           email: user.email,
           role: user.role,
+          rolePending: user.rolePending,
           isApproved: user.isApproved,
         },
       });
   }
 );
-
 
 const client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -61,14 +61,10 @@ export const googleSignIn = createError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { code, token, state } = req.body;
 
-    console.log(code);
-
-    // res.status(200).json({ message: "Google login successful", code });
     let payload: any = null;
     let refreshToken: string | undefined;
 
     if (code) {
-      // 🟢 1. Exchange code for tokens (refresh_token + id_token)
       const { tokens } = await client.getToken(code);
 
       client.setCredentials(tokens);
@@ -81,7 +77,6 @@ export const googleSignIn = createError(
       payload = ticket.getPayload();
       refreshToken = tokens.refresh_token || undefined;
     } else if (token) {
-      // 🟢 2. Verify ID token directly
       const ticket = await client.verifyIdToken({
         idToken: token,
         audience: process.env.GOOGLE_CLIENT_ID,
@@ -92,13 +87,11 @@ export const googleSignIn = createError(
       return next(new ApiError("Code or token is required", 400));
     }
 
-    // 🟢 3. Validate payload
     if (!payload?.email || !payload.name) {
       return next(new ApiError("Invalid token", 400));
     }
 
-    // 🟢 4. Find or create user
-    const [user] = await User.findOrCreate({
+    const [user, created] = await User.findOrCreate({
       where: { email: payload.email, googleId: payload.sub },
       defaults: {
         email: payload.email,
@@ -117,8 +110,7 @@ export const googleSignIn = createError(
       await user.save();
     }
 
-
-    // 🟢 5. Generate JWT
+    // Generate JWT
     const jwtToken = user.generateAuthToken();
 
     res
@@ -130,12 +122,15 @@ export const googleSignIn = createError(
       })
       .status(200)
       .json({
+        message: created ? "Signup successful" : "Signin successful",
         token: jwtToken,
         user: {
           id: user.id,
           email: user.email,
           username: user.username,
-          role: user.role
+          role: user.role,
+          rolePending: user.rolePending,
+          isApproved: user.isApproved,
         },
       });
   }
