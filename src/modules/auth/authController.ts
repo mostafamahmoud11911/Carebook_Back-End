@@ -36,7 +36,8 @@ export const login = createError(
     res
       .cookie("token", token, {
         httpOnly: true,
-        sameSite: "lax",   // THIS IS THE FIX
+        secure: true,
+        sameSite: "none",
         path: "/",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
