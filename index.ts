@@ -6,7 +6,6 @@ import ApiError from "./utils/ApiError";
 import sequelize from "./db/db";
 import bootstrap from "./src/modules/bootstrap";
 import helmet from "helmet";
-import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./utils/passportSetUp";
 import { googleSignIn } from "./src/modules/auth/authController";
@@ -20,7 +19,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(morgan("dev"));
-
+app.use(helmet());
 app.use(
   cors({
     origin: process.env.PUBLIC_URL,
